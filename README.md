@@ -1,8 +1,8 @@
 # classical-corpus
 
-中国古典文献结构化语料集 — 把殆知阁、wikisource、shuowenjiezi 等公开文本转为统一 JSON schema，可直接喂给任何 LLM 训练或评测。
+中国古典文献结构化语料集 — 把殆知阁、wikisource、ctext.org、shuowenjiezi 等公开文本转为统一 JSON schema，可直接喂给任何 LLM 训练或评测。
 
-**当前版本：v0.7** — 完整十三经 + 说文解字 + 资治通鉴 + 二十四史前 9 部，~1360 万字，11,507 条记录。
+**当前版本：v0.9** — 完整十三经 + 说文解字 + 资治通鉴 + 二十四史前 15 部，~1740 万字，11,782 条记录。
 
 ## 覆盖
 
@@ -19,32 +19,38 @@
 | 论语 | 20 | 22K | chinese-poetry |
 | 孟子 | 14 | 46K | chinese-poetry |
 | 诗经 | 305 | 38K | chinese-poetry |
-| 尚书 | 55 | 34K | 殆知阁 |
+| 尚书 | 57 | 36K | 殆知阁 + ctext.org（益稷/禹贡补全） |
 | 礼记 | 47 | 131K | 殆知阁 |
-| 周易 | 67 | 34K | 殆知阁 |
+| 周易 | 69 | 37K | 殆知阁 + ctext.org（屯卦/系辞上补全）|
 | 春秋左传 | 12 | 264K | 殆知阁 |
 | 春秋公羊传 | 12 | 75K | 殆知阁 |
 | 春秋穀梁传 | 12 | 42K | wikisource (繁→简) |
 | 孝经 | 18 | 2K | 殆知阁 |
 | 尔雅 | 19 | 20K | 殆知阁 |
 
-### 二十四史前 9 部
-| 文献 | 条数 | 字数 | 作者 | 来源 |
-|------|------|------|------|------|
-| 史记 | 130 | 1.11M | 司马迁 | 殆知阁四库版 |
-| 汉书 | 101 | 895K | 班固 | 殆知阁 |
-| 后汉书 | 130 | 1.21M | 范晔 | 殆知阁四库版 |
-| 三国志 | 65 | 734K | 陈寿 | 殆知阁 |
-| 晋书 | 129 | 1.43M | 房玄龄等 | 殆知阁 |
-| 宋书 | 99 | 1.01M | 沈约 | 殆知阁 |
-| 南齐书 | 57 | 358K | 萧子显 | 殆知阁 |
-| 梁书 | 55 | 349K | 姚思廉 | 殆知阁 |
-| 陈书 | 35 | 187K | 姚思廉 | 殆知阁 |
+### 二十四史前 15 部
+| 文献 | 条数 | 字数 | 来源 | 完整度 |
+|------|------|------|------|--------|
+| 史记 | 130 | 1.11M | 殆知阁四库版 | ✓ |
+| 汉书 | 101 | 895K | 殆知阁 | ✓ |
+| 后汉书 | 130 | 1.21M | 殆知阁四库版 | ✓ |
+| 三国志 | 65 | 734K | 殆知阁 | ✓ |
+| 晋书 | 129 | 1.43M | 殆知阁 | 缺1卷 |
+| 宋书 | 99 | 1.01M | 殆知阁 | 缺1卷 |
+| 南齐书 | 57 | 358K | 殆知阁 | 缺2卷 |
+| 梁书 | 55 | 349K | 殆知阁 | 缺1卷 |
+| 陈书 | 35 | 187K | 殆知阁 | 缺1卷 |
+| 魏书 | 2 | 1.27M | 殆知阁 | ⚠ body 仅 TOC，正文为单条 |
+| 北齐书 | 50 | 292K | 殆知阁 | ✓ |
+| 周书 | 49 | 318K | 殆知阁 | 缺1卷 |
+| 南史 | 1 | 829K | 殆知阁 | ⚠ body 仅 TOC，正文为单条 |
+| 北史 | 86 | 1.19M | 殆知阁 | 缺14卷 |
+| 隋书 | 83 | 844K | 殆知阁 | 缺2卷 |
 
 ### 编年史
 | 文献 | 条数 | 字数 |
 |------|------|------|
-| 资治通鉴 | 292 | 4.67M |
+| 资治通鉴 | 292 | 4.67M | 殆知阁（卷158/171殆知阁源缺）|
 
 ## 用法
 
@@ -69,15 +75,14 @@ print(ds[0])
 
 - **[殆知阁古代文献](https://github.com/garychowcmu/daizhigev20)** — 主要语料源（17 亿字 plaintext）
 - **[chinese-poetry](https://github.com/chinese-poetry/chinese-poetry)** — 诗经 + 四书 已是 JSON
-- **[zh.wikisource.org](https://zh.wikisource.org/wiki/春秋穀梁傳)** — 穀梁传（殆知阁仅有注疏版）
-- **[shuowenjiezi/shuowen](https://github.com/shuowenjiezi/shuowen)** — 说文 □ 字修复的交叉参考源
-
-源数据未托管在本仓库，需自行 clone。
+- **[zh.wikisource.org](https://zh.wikisource.org/wiki/春秋穀梁傳)** — 穀梁传
+- **[ctext.org](https://ctext.org)** — 尚书/周易 缺漏补全
+- **[shuowenjiezi/shuowen](https://github.com/shuowenjiezi/shuowen)** — 说文 □ 字修复
 
 ## 重新生成
 
 ```bash
-pip install opencc-python-reimplemented   # 仅 scrape_guliang.py + fix_shuowen_boxes.py 需要
+pip install opencc-python-reimplemented   # for scrape_guliang.py / fix_shuowen_boxes.py / fill_gaps.py
 
 python scripts/extract_shuowen.py
 python scripts/fix_shuowen_boxes.py        # 修复 1746 个 □ 字头
@@ -85,25 +90,23 @@ python scripts/extract_sishu.py
 python scripts/extract_shijing.py
 python scripts/extract_wujing_others.py
 python scripts/extract_remaining_classics.py
-python scripts/scrape_guliang.py            # 网络爬取，~15 秒
+python scripts/scrape_guliang.py            # 网络爬取
+python scripts/fill_gaps.py                 # 尚书/周易 缺漏补全
 python scripts/extract_zizhi_tongjian.py
-python scripts/extract_histories.py         # 9 部正史
+python scripts/extract_histories.py         # 15 部正史
 python scripts/build_corpus.py              # 合并 → corpus.jsonl + stats.md
 ```
 
 ## 已知数据问题
 
 - **说文 356 字仍为 □** (3.6%)：shuowenjiezi/shuowen 中也无对应或反切歧义
-- **资治通鉴卷 158、171**：殆知阁源文中只有标题占位符（v0.8 计划补）
+- **资治通鉴卷 158、171**：无公开源按卷索引，无法补全
 - **资治通鉴卷 258**：作者属字误为 `寀`，实为 `宋`
-- **周易缺卦三、系辞上**：源文格式异常未匹配
-- **尚书缺 3 篇**（益稷、禹贡、泰誓上）：源文 TOC 列出但无正文
+- **魏书/南史**：殆知阁源 body 仅有 TOC + 一段未分章正文，内容仍存在但未按卷拆分
 
 ## 路线图
 
-- **v0.8** — 补全资治通鉴 158/171 + 尚书/周易缺漏（需自定义 wikisource/ctext 爬虫）
-- **v0.9** — 加二十四史下 6 部（魏书、北齐书、周书、南史、北史、隋书）
-- **v1.0** — 加古译今对齐数据（指令微调集）
+- **v1.0** — 加古译今对齐数据（指令微调集）；加二十四史下 9 部（旧唐书、新唐书、旧五代史、新五代史、宋史、辽史、金史、元史、明史、清史稿）
 - **v1.x** — 加部首/字形分解维度（结合 cjkvi-ids，做表意建模数据）
 
 ## License

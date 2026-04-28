@@ -25,16 +25,25 @@ QKINDI_VOL_RE = re.compile(
     re.M,
 )
 
-# Strategy B: 卷X title with optional indent
+# Strategy B: 卷X title with optional indent and optional book-name prefix.
+# Catches plain "卷一 帝纪第一" (汉书) AND "周书卷一　　帝纪第一" (周书 body markers).
 INDENT_VOL_RE = re.compile(
-    r"^[\s　]*(?P<title>卷[一-鿿]+(?:[上中下])?\s+[一-鿿]+第[一-鿿]+(?:[上中下])?)",
+    r"^[\s　]*(?P<title>[一-鿿]{0,4}卷[一-鿿]+(?:[上中下])?[\s　]+[一-鿿]+第[一-鿿]+(?:[上中下])?)",
     re.M,
 )
 
-# Strategy C: ordinal-only marker (帝纪/本纪/列传/载记/志) at line start, no 卷X prefix
-# Used by 晋书/宋书/南齐书/梁书/陈书 where body has no 卷 markers
+# Strategy C: ordinal-only marker (帝纪/本纪/列传/载记/志) at line start, no 卷X prefix.
+# Used by 晋书/宋书/南齐书/梁书/陈书. Allows optional 补 prefix (北齐书 has 补帝纪/补列传
+# from chapters reconstructed after lost original text).
 ORDINAL_RE = re.compile(
-    r"^[\s　]*(?P<title>(?:帝纪|本纪|列传|载记|志)第[一-鿿]+(?:[上中下])?(?:[\s　]+[^\n]*)?)",
+    r"^[\s　]*(?P<title>补?(?:帝纪|本纪|列传|载记|志)第[一-鿿]+(?:[上中下])?(?:[\s　]+[^\n]*)?)",
+    re.M,
+)
+
+# Strategy D: reverse 第N卷 format with optional 补 + ordinal type
+# Used by 北齐书 body: "第一卷　　补帝纪第一"
+REVERSE_VOL_RE = re.compile(
+    r"^[\s　]*(?P<title>第[一-鿿]+卷[\s　]+补?(?:帝纪|本纪|列传|载记|志)第[一-鿿]+(?:[上中下])?(?:[\s　]+[^\n]*)?)",
     re.M,
 )
 
@@ -91,6 +100,29 @@ def extract_strategy_a(path: Path, key: str, name: str, author: str, era: str) -
                 "volume": vol_num_from_title(title),
                 "chapter": title,
                 "content": body,
+            }
+        )
+    return out
+
+
+def extract_strategy_d(path: Path, key: str, name: str, author: str, era: str) -> list[dict]:
+    """Use 第N卷 reverse-order markers. Used by 北齐书."""
+    text = path.read_text(encoding="utf-8")
+    matches = list(REVERSE_VOL_RE.finditer(text))
+    if not matches:
+        return []
+    out = []
+    for seq, m in enumerate(matches, 1):
+        title = m.group("title").strip()
+        end = matches[seq].start() if seq < len(matches) else len(text)
+        body = text[m.end():end].strip()
+        if not body:
+            continue
+        out.append(
+            {
+                "id": f"{key}#{seq}",
+                "source": name, "author": author, "era": era, "category": "史",
+                "volume": seq, "chapter": title, "content": body,
             }
         )
     return out
@@ -195,13 +227,27 @@ HISTORIES = [
      "path": "史藏/正史/梁书.txt", "strategy": "c", "expected": 56},
     {"key": "chenshu", "name": "陈书", "author": "姚思廉", "era": "唐",
      "path": "史藏/正史/陈书.txt", "strategy": "c", "expected": 36},
+    # v0.9
+    {"key": "weishu", "name": "魏书", "author": "魏收", "era": "北齐",
+     "path": "史藏/正史/魏书.txt", "strategy": "b", "expected": 130},
+    {"key": "beiqishu", "name": "北齐书", "author": "李百药", "era": "唐",
+     "path": "史藏/正史/北齐书.txt", "strategy": "d", "expected": 50},
+    {"key": "zhoushu", "name": "周书", "author": "令狐德棻等", "era": "唐",
+     "path": "史藏/正史/周书.txt", "strategy": "b", "expected": 50},
+    {"key": "nanshi", "name": "南史", "author": "李延寿", "era": "唐",
+     "path": "史藏/正史/南史.txt", "strategy": "b", "expected": 80},
+    {"key": "beishi", "name": "北史", "author": "李延寿", "era": "唐",
+     "path": "史藏/正史/北史.txt", "strategy": "c", "expected": 100},
+    {"key": "suishu", "name": "隋书", "author": "魏徵等", "era": "唐",
+     "path": "史藏/正史/隋书.txt", "strategy": "c", "expected": 85},
 ]
 
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    print("=== 二十四史前 9 部 ===")
-    strategies = {"a": extract_strategy_a, "b": extract_strategy_b, "c": extract_strategy_c}
+    print("=== 二十四史前 15 部 ===")
+    strategies = {"a": extract_strategy_a, "b": extract_strategy_b,
+                  "c": extract_strategy_c, "d": extract_strategy_d}
     for h in HISTORIES:
         path = DAIZHI / h["path"]
         fn = strategies[h["strategy"]]
