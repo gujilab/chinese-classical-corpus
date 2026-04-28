@@ -31,6 +31,13 @@ INDENT_VOL_RE = re.compile(
     re.M,
 )
 
+# Strategy C: ordinal-only marker (帝纪/本纪/列传/载记/志) at line start, no 卷X prefix
+# Used by 晋书/宋书/南齐书/梁书/陈书 where body has no 卷 markers
+ORDINAL_RE = re.compile(
+    r"^[\s　]*(?P<title>(?:帝纪|本纪|列传|载记|志)第[一-鿿]+(?:[上中下])?(?:[\s　]+[^\n]*)?)",
+    re.M,
+)
+
 CN_NUM = {c: i for i, c in enumerate("零一二三四五六七八九", 0)}
 CN_UNIT = {"十": 10, "百": 100, "千": 1000}
 
@@ -89,6 +96,43 @@ def extract_strategy_a(path: Path, key: str, name: str, author: str, era: str) -
     return out
 
 
+def extract_strategy_c(path: Path, key: str, name: str, author: str, era: str) -> list[dict]:
+    """Use ordinal-only markers (帝纪/本纪/...) at line start. Skip TOC by gap filter."""
+    text = path.read_text(encoding="utf-8")
+    matches = list(ORDINAL_RE.finditer(text))
+    if not matches:
+        return []
+
+    # gap filter: TOC has tight markers, body has spaced ones
+    body_start_idx = 0
+    for i in range(len(matches) - 1):
+        if matches[i + 1].start() - matches[i].end() > 200:
+            body_start_idx = i + 1
+            break
+    matches = matches[body_start_idx:]
+
+    out = []
+    for seq, m in enumerate(matches, 1):
+        title = m.group("title").strip()
+        end = matches[seq].start() if seq < len(matches) else len(text)
+        body = text[m.end():end].strip()
+        if not body:
+            continue
+        out.append(
+            {
+                "id": f"{key}#{seq}",
+                "source": name,
+                "author": author,
+                "era": era,
+                "category": "史",
+                "volume": seq,
+                "chapter": title,
+                "content": body,
+            }
+        )
+    return out
+
+
 def extract_strategy_b(path: Path, key: str, name: str, author: str, era: str) -> list[dict]:
     """Use 卷X markers with TOC→body gap filter."""
     text = path.read_text(encoding="utf-8")
@@ -131,51 +175,36 @@ def extract_strategy_b(path: Path, key: str, name: str, author: str, era: str) -
 
 
 HISTORIES = [
-    {
-        "key": "shiji",
-        "name": "史记",
-        "author": "司马迁",
-        "era": "汉",
-        "path": "史藏/正史/史记四库.txt",
-        "strategy": "a",
-        "expected": 130,
-    },
-    {
-        "key": "hanshu",
-        "name": "汉书",
-        "author": "班固",
-        "era": "汉",
-        "path": "史藏/正史/汉书.txt",
-        "strategy": "b",
-        "expected": 100,
-    },
-    {
-        "key": "houhanshu",
-        "name": "后汉书",
-        "author": "范晔",
-        "era": "南朝宋",
-        "path": "史藏/正史/后汉书四库.txt",
-        "strategy": "a",
-        "expected": 120,
-    },
-    {
-        "key": "sanguozhi",
-        "name": "三国志",
-        "author": "陈寿",
-        "era": "晋",
-        "path": "史藏/正史/三国志.txt",
-        "strategy": "a",
-        "expected": 65,
-    },
+    # v0.5
+    {"key": "shiji", "name": "史记", "author": "司马迁", "era": "汉",
+     "path": "史藏/正史/史记四库.txt", "strategy": "a", "expected": 130},
+    {"key": "hanshu", "name": "汉书", "author": "班固", "era": "汉",
+     "path": "史藏/正史/汉书.txt", "strategy": "b", "expected": 100},
+    {"key": "houhanshu", "name": "后汉书", "author": "范晔", "era": "南朝宋",
+     "path": "史藏/正史/后汉书四库.txt", "strategy": "a", "expected": 120},
+    {"key": "sanguozhi", "name": "三国志", "author": "陈寿", "era": "晋",
+     "path": "史藏/正史/三国志.txt", "strategy": "a", "expected": 65},
+    # v0.7
+    {"key": "jinshu", "name": "晋书", "author": "房玄龄等", "era": "唐",
+     "path": "史藏/正史/晋书.txt", "strategy": "c", "expected": 130},
+    {"key": "songshu", "name": "宋书", "author": "沈约", "era": "南朝梁",
+     "path": "史藏/正史/宋书.txt", "strategy": "c", "expected": 100},
+    {"key": "nanqishu", "name": "南齐书", "author": "萧子显", "era": "南朝梁",
+     "path": "史藏/正史/南齐书.txt", "strategy": "c", "expected": 59},
+    {"key": "liangshu", "name": "梁书", "author": "姚思廉", "era": "唐",
+     "path": "史藏/正史/梁书.txt", "strategy": "c", "expected": 56},
+    {"key": "chenshu", "name": "陈书", "author": "姚思廉", "era": "唐",
+     "path": "史藏/正史/陈书.txt", "strategy": "c", "expected": 36},
 ]
 
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    print("=== 二十四史前 4 部 ===")
+    print("=== 二十四史前 9 部 ===")
+    strategies = {"a": extract_strategy_a, "b": extract_strategy_b, "c": extract_strategy_c}
     for h in HISTORIES:
         path = DAIZHI / h["path"]
-        fn = extract_strategy_a if h["strategy"] == "a" else extract_strategy_b
+        fn = strategies[h["strategy"]]
         records = fn(path, h["key"], h["name"], h["author"], h["era"])
 
         dst = OUTPUT_DIR / f"{h['key']}.json"
