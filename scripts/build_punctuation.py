@@ -76,23 +76,21 @@ def main() -> None:
                 # skip if barely changed (means input already lacked punct)
                 if len(chunk) - len(stripped) < 3:
                     continue
+                has_box = "□" in chunk or "□" in stripped
 
                 n_records += 1
-                out.write(
-                    json.dumps(
-                        {
-                            "id": f"punct#{n_records}",
-                            "task": "punctuate",
-                            "instruction": random.choice(PROMPTS),
-                            "input": stripped,
-                            "output": chunk,
-                            "source": src,
-                            "category": rec.get("category", ""),
-                        },
-                        ensure_ascii=False,
-                    )
-                    + "\n"
-                )
+                rec_out = {
+                    "id": f"punct#{n_records}",
+                    "task": "punctuate",
+                    "instruction": random.choice(PROMPTS),
+                    "input": stripped,
+                    "output": chunk,
+                    "source": src,
+                    "category": rec.get("category", ""),
+                }
+                if has_box:
+                    rec_out["_has_box"] = True
+                out.write(json.dumps(rec_out, ensure_ascii=False) + "\n")
                 by_source[src] = by_source.get(src, 0) + 1
 
     size_mb = OUT_PATH.stat().st_size / 1024 / 1024

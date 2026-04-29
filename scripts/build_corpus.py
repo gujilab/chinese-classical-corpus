@@ -11,8 +11,10 @@ STATS_PATH = OUTPUT_DIR / "stats.md"
 
 
 def iter_json_files(root: Path):
+    # exclude support files that aren't record arrays
+    skip = {"corpus.json", "stats.json", "box_recovery.json"}
     for p in sorted(root.rglob("*.json")):
-        if p.name in {"corpus.json", "stats.json"}:
+        if p.name in skip:
             continue
         yield p
 

@@ -22,6 +22,17 @@ import random
 import re
 from pathlib import Path
 
+# Load □ recovery map (NiuTrans sources cross-referenced against chtxt 繁体)
+_RECOVERY_PATH = Path(__file__).parent.parent / "output" / "box_recovery.json"
+RECOVERY_MAP: dict[str, str] = {}
+if _RECOVERY_PATH.exists():
+    RECOVERY_MAP = json.load(_RECOVERY_PATH.open(encoding="utf-8"))
+
+
+def apply_recovery(book: str, sentence: str) -> str:
+    """Substitute recovered version if available."""
+    return RECOVERY_MAP.get(f"{book}::{sentence}", sentence)
+
 REPO_ROOT = Path("/Users/zion/Documents/zion/classical-corpus")
 NIUTRANS = Path(
     "/Users/zion/Documents/zion/reference/Chinese/classical/corpora/Classical-Modern/双语数据"
@@ -77,6 +88,7 @@ def categorize(book: str) -> str:
 
 
 def is_valid_pair(src: str, tgt: str) -> bool:
+    """Validate src/target pair. Records with □ are kept (flagged downstream)."""
     src, tgt = src.strip(), tgt.strip()
     if len(src) < 4 or len(tgt) < 4:
         return False
@@ -124,43 +136,40 @@ def main() -> None:
                         continue
 
                     s, t = s.strip(), t.strip()
+                    # apply □ recovery if we have a chtxt cross-reference
+                    s = apply_recovery(book, s)
+                    has_box = "□" in s or "□" in t
 
                     # 古→今
                     n_records += 1
-                    out.write(
-                        json.dumps(
-                            {
-                                "id": f"instruct#{n_records}",
-                                "task": "c2m",
-                                "instruction": random.choice(C2M_PROMPTS),
-                                "input": s,
-                                "output": t,
-                                "source": source_label,
-                                "category": cat,
-                            },
-                            ensure_ascii=False,
-                        )
-                        + "\n"
-                    )
+                    rec_c2m = {
+                        "id": f"instruct#{n_records}",
+                        "task": "c2m",
+                        "instruction": random.choice(C2M_PROMPTS),
+                        "input": s,
+                        "output": t,
+                        "source": source_label,
+                        "category": cat,
+                    }
+                    if has_box:
+                        rec_c2m["_has_box"] = True
+                    out.write(json.dumps(rec_c2m, ensure_ascii=False) + "\n")
                     book_count += 1
 
                     # 今→古
                     n_records += 1
-                    out.write(
-                        json.dumps(
-                            {
-                                "id": f"instruct#{n_records}",
-                                "task": "m2c",
-                                "instruction": random.choice(M2C_PROMPTS),
-                                "input": t,
-                                "output": s,
-                                "source": source_label,
-                                "category": cat,
-                            },
-                            ensure_ascii=False,
-                        )
-                        + "\n"
-                    )
+                    rec_m2c = {
+                        "id": f"instruct#{n_records}",
+                        "task": "m2c",
+                        "instruction": random.choice(M2C_PROMPTS),
+                        "input": t,
+                        "output": s,
+                        "source": source_label,
+                        "category": cat,
+                    }
+                    if has_box:
+                        rec_m2c["_has_box"] = True
+                    out.write(json.dumps(rec_m2c, ensure_ascii=False) + "\n")
                     book_count += 1
 
             by_book[book] = book_count
