@@ -9,3 +9,8 @@ venv/
 .vscode/
 *.swp
 *.swo
+
+# v1.0 instruction tuning data — too large for git, regenerate via scripts
+# punctuate.jsonl (60MB) is committed; translate.jsonl (640MB) is not.
+# Run scripts/build_instruct.py after cloning NiuTrans/Classical-Modern.
+output/instruct/translate.jsonl
