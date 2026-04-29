@@ -1,5 +1,7 @@
 # classical-corpus
 
+> 📦 **Available on HuggingFace Datasets**: [dzxr/chinese-classical-corpus](https://huggingface.co/datasets/dzxr/chinese-classical-corpus) — load via `datasets.load_dataset()` without rebuilding from sources.
+
 中国古典文献结构化语料集 — 把殆知阁、wikisource、ctext.org、shuowenjiezi、chtxt、hunterhug 等公开文本转为统一 JSON schema，可直接喂给任何 LLM 训练或评测。
 
 **当前版本：v1.1** — 在 v0.10 基础上 (1760 万字源语料) 新增**指令微调数据集**：
