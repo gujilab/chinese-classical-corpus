@@ -82,9 +82,6 @@ def is_valid_pair(src: str, tgt: str) -> bool:
         return False
     if len(src) > 500 or len(tgt) > 500:
         return False
-    # drop pairs with □ placeholders (unrenderable CJK chars in source)
-    if "□" in src or "□" in tgt:
-        return False
     # ratio check: extreme imbalance suggests misalignment
     ratio = max(len(src), len(tgt)) / max(min(len(src), len(tgt)), 1)
     if ratio > 10:

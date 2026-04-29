@@ -3,8 +3,8 @@
 中国古典文献结构化语料集 — 把殆知阁、wikisource、ctext.org、shuowenjiezi、chtxt、hunterhug 等公开文本转为统一 JSON schema，可直接喂给任何 LLM 训练或评测。
 
 **当前版本：v1.1** — 在 v0.10 基础上 (1760 万字源语料) 新增**指令微调数据集**：
-- 古译今 + 今译古 双向翻译: **192 万条** (640 MB jsonl, NiuTrans 来源, □-free)
-- 断句加标点: **4.6 万条** (57 MB jsonl, □-free)
+- 古译今 + 今译古 双向翻译: **192 万条** (640 MB jsonl, NiuTrans 来源)
+- 断句加标点: **4.9 万条** (60 MB jsonl)
 - 总计 **197 万条指令记录**，覆盖 97 部典籍
 
 详见 [output/instruct/README.md](output/instruct/README.md).

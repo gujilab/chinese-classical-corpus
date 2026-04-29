@@ -76,9 +76,6 @@ def main() -> None:
                 # skip if barely changed (means input already lacked punct)
                 if len(chunk) - len(stripped) < 3:
                     continue
-                # drop chunks with □ placeholders (unrenderable CJK chars)
-                if "□" in chunk:
-                    continue
 
                 n_records += 1
                 out.write(
