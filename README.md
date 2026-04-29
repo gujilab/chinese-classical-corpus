@@ -2,7 +2,7 @@
 
 中国古典文献结构化语料集 — 把殆知阁、wikisource、ctext.org、shuowenjiezi、chtxt、hunterhug 等公开文本转为统一 JSON schema，可直接喂给任何 LLM 训练或评测。
 
-**当前版本：v1.0** — 在 v0.10 基础上 (1760 万字源语料) 新增**指令微调数据集**：
+**当前版本：v1.1** — 在 v0.10 基础上 (1760 万字源语料) 新增**指令微调数据集**：
 - 古译今 + 今译古 双向翻译: **192 万条** (640 MB jsonl, NiuTrans 来源)
 - 断句加标点: **4.9 万条** (60 MB jsonl)
 - 总计 **197 万条指令记录**，覆盖 97 部典籍
@@ -48,7 +48,7 @@
 | 魏书 | 130 | 1.23M | chtxt (繁→简) |
 | 北齐书 | 49 | 261K | chtxt (繁→简) |
 | 周书 | 49 | 318K | 殆知阁 |
-| 南史 | 1 | 829K | 殆知阁（仅 TOC，正文为单条）|
+| 南史 | 76 | 328K | NiuTrans/Classical-Modern (76/80 卷) |
 | 北史 | 99 | 1.36M | chtxt (繁→简) |
 | 隋书 | 85 | 866K | chtxt (繁→简) |
 
@@ -84,6 +84,7 @@ print(ds[0])
 - **[ctext.org](https://ctext.org)** — 尚书/周易 缺漏补全
 - **[shuowenjiezi/shuowen](https://github.com/shuowenjiezi/shuowen)** — 说文 □ 字修复
 - **[chtxt](https://github.com/JasonWade001/chtxt)** — 二十四史清洁版（9 部 繁→简）
+- **[NiuTrans/Classical-Modern](https://github.com/NiuTrans/Classical-Modern)** — 南史 76 卷 + 古译今 192 万对句
 
 ## 重新生成
 
@@ -107,7 +108,7 @@ python scripts/build_corpus.py
 ## 已知数据问题
 
 - **说文 356 字仍为 □** (3.6%)：shuowenjiezi/shuowen 中也无对应或反切歧义
-- **南史 1 条**：殆知阁 body 仅 TOC + 未分章正文；wikisource/ctext/chtxt 均无；hunterhug 仅 10/80 卷
+- **南史**: 76/80 卷 (NiuTrans 提供，缺最末 4 卷)
 - **资治通鉴卷 258 字误**：源文中作者属字误为 `寀`，实为 `宋`
 
 ## 路线图
