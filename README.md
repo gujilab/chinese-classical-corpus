@@ -8,7 +8,7 @@
 
 中国古典文献结构化语料集 — 把殆知阁、wikisource、ctext.org、shuowenjiezi、chtxt、hunterhug 等公开文本转为统一 JSON schema，可直接喂给任何 LLM 训练或评测。
 
-**当前版本：v1.1** — 在 v0.10 基础上 (1760 万字源语料) 新增**指令微调数据集**：
+**当前版本：v1.3** — 1724 万字源语料（v1.3 补全南史卷 2/7/68/74 → 80/80 卷完整）+ **指令微调数据集**：
 - 古译今 + 今译古 双向翻译: **192 万条** (640 MB jsonl, NiuTrans 来源)
 - 断句加标点: **4.9 万条** (60 MB jsonl)
 - 总计 **197 万条指令记录**，覆盖 97 部典籍
@@ -54,7 +54,7 @@
 | 魏书 | 130 | 1.23M | chtxt (繁→简) |
 | 北齐书 | 49 | 261K | chtxt (繁→简) |
 | 周书 | 49 | 318K | 殆知阁 |
-| 南史 | 76 | 328K | NiuTrans/Classical-Modern (76/80 卷) |
+| 南史 | 80 | 365K | NiuTrans/Classical-Modern + wikisource (vols 2/7/68/74 补全) |
 | 北史 | 99 | 1.36M | chtxt (繁→简) |
 | 隋书 | 85 | 866K | chtxt (繁→简) |
 
@@ -91,6 +91,7 @@ print(ds[0])
 - **[shuowenjiezi/shuowen](https://github.com/shuowenjiezi/shuowen)** — 说文 □ 字修复
 - **[chtxt](https://github.com/JasonWade001/chtxt)** — 二十四史清洁版（9 部 繁→简）
 - **[NiuTrans/Classical-Modern](https://github.com/NiuTrans/Classical-Modern)** — 南史 76 卷 + 古译今 192 万对句
+- **[zh.wikisource.org](https://zh.wikisource.org/wiki/南史)** — 南史 卷 2/7/68/74（NiuTrans 缺漏补全）
 
 ## 重新生成
 
@@ -108,19 +109,21 @@ python scripts/fill_gaps.py
 python scripts/extract_zizhi_tongjian.py
 python scripts/extract_histories.py
 python scripts/patch_alternates.py    # 资治通鉴 158/171 + chtxt 替换
+python scripts/scrape_nanshi_missing.py  # 南史 卷 2/7/68/74 从 wikisource 补全 (v1.3)
 python scripts/build_corpus.py
 ```
 
 ## 已知数据问题
 
 - **说文 356 字仍为 □** (3.6%)：shuowenjiezi/shuowen 中也无对应或反切歧义
-- **南史**: 76/80 卷 (NiuTrans 提供，缺最末 4 卷)
+- ~~**南史**: 76/80 卷 (NiuTrans 提供，缺最末 4 卷)~~ **已修复** (v1.3) — 卷 2/7/68/74 从 wikisource 补全，现 80/80 卷完整
 - **资治通鉴卷 258 字误**：源文中作者属字误为 `寀`，实为 `宋`
 
 ## 路线图
 
-- **v1.1** — 部首/字形分解维度（cjkvi-ids 整合做表意建模辅助数据）
-- **v1.2** — 古文阅读理解 Q&A（GPT 辅助生成）
+- ✅ **v1.3** — 南史 80/80 卷完整（wikisource 补全卷 2/7/68/74）
+- **v1.4** — 部首/字形分解维度（cjkvi-ids 整合做表意建模辅助数据）
+- **v1.5** — 古文阅读理解 Q&A
 - **v2.0** — 加二十四史下 9 部（旧/新唐书、旧/新五代史、宋史、辽金元明史）
 
 ## License

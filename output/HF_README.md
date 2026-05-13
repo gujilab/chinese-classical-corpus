@@ -126,12 +126,13 @@ NiuTrans 源中 1,266 条记录含 □（占指令数据 0.06%），分两类：
 - [shuowenjiezi/shuowen](https://github.com/shuowenjiezi/shuowen) — 说文 □ 字修复
 - [chtxt](https://github.com/JasonWade001/chtxt) — 二十四史清洁版繁体（9 部 繁→简）
 - [NiuTrans/Classical-Modern](https://github.com/NiuTrans/Classical-Modern) (MIT) — 古译今对齐 + 南史 76 卷
+- [zh.wikisource.org](https://zh.wikisource.org/wiki/南史) — 南史 卷 2/7/68/74 补全
 
 ## 已知数据问题
 
 - **说文 356 字仍为 □** (3.6%)：跨参考源也无法消歧
 - **资治通鉴 卷 258**：源文中作者属字误为 `寀` (cǎi)，实为 `宋` (sòng)
-- **南史 76/80 卷**：NiuTrans 上游缺最末 4 卷
+- ~~**南史 76/80 卷**：NiuTrans 上游缺最末 4 卷~~ **已修复** (v1.3) — 缺的卷 2/7/68/74 从 wikisource 补全；现 80/80 卷完整
 - **生僻字 ASCII 化**：极个别 CJK Ext G 字符在转换中可能丢失
 
 ## 路线图
