@@ -19,7 +19,7 @@
 
 中文 —— 尤其是文言文 —— 在 LLM 时代有一个被严重低估的优势：**信息密度**。
 
-- **Token 经济学**：同一句话的文言文表达，token 数约为现代英文的 1/2，比现代白话还再压缩 30-40%
+- **Token 经济学**：同一句话的文言文表达，token 数约为现代英文的 1/2，比现代白话还再压缩 30-40%（**实测**：7 个 tokenizer 横评见 [chinese-classical-bench / tokenizer_study](https://github.com/gujilab/chinese-classical-bench/blob/main/tokenizer_study/report.md) —— DeepSeek-V3 tokenizer 上文言文是英文 0.57×；老 GPT-3.5/4 cl100k_base 对中文反而比英文还费 19% token）
 - **典故 = 语义级 RAG 压缩**："图穷匕见"四字承载一整段故事 —— 典故是嵌在语言里的、人类沉淀 2000+ 年的"超浓缩 token"
 - **3000+ 年单一书写系统**：跨时代知识图谱、概念演化建模都靠它，是任何字母语言天生缺失的时间深度训练信号
 
