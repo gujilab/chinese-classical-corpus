@@ -30,8 +30,8 @@ configs:
 
 # Chinese Classical Corpus
 
-> 🔗 **源码 & 构建脚本**: [github.com/zi6me/chinese-classical-corpus](https://github.com/zi6me/chinese-classical-corpus) — 完整抽取 pipeline、14 个 Python 脚本、验证套件
-> 🎯 **配套评测基准**: [dzxr/chinese-classical-bench](https://huggingface.co/datasets/dzxr/chinese-classical-bench) — 500 道题 × 5 任务，测 LLM 古典文献能力（题目均从本语料抽样）
+> 🔗 **源码 & 构建脚本**: [github.com/gujilab/chinese-classical-corpus](https://github.com/gujilab/chinese-classical-corpus) — 完整抽取 pipeline、14 个 Python 脚本、验证套件
+> 🎯 **配套评测基准**: [gujilab/chinese-classical-bench](https://huggingface.co/datasets/gujilab/chinese-classical-bench) — 500 道题 × 5 任务，测 LLM 古典文献能力（题目均从本语料抽样）
 
 中国古典文献结构化语料集，含完整十三经 + 说文解字 + 资治通鉴 + 二十四史前 15 部，以及 197 万条古译今/今译古/断句指令对。
 
@@ -43,13 +43,13 @@ configs:
 from datasets import load_dataset
 
 # 源语料 (12,005 条章节级记录, 17.2M 字)
-corpus = load_dataset("dzxr/chinese-classical-corpus", "corpus", split="train")
+corpus = load_dataset("gujilab/chinese-classical-corpus", "corpus", split="train")
 
 # 古译今 / 今译古 双向指令数据 (1,924,378 条)
-translate = load_dataset("dzxr/chinese-classical-corpus", "translate", split="train")
+translate = load_dataset("gujilab/chinese-classical-corpus", "translate", split="train")
 
 # 断句加标点指令 (46,546 条)
-punctuate = load_dataset("dzxr/chinese-classical-corpus", "punctuate", split="train")
+punctuate = load_dataset("gujilab/chinese-classical-corpus", "punctuate", split="train")
 
 print(corpus[0])
 # {'id': 'shuowen#1', 'source': '说文解字', 'author': '许慎', 'era': '汉',
@@ -145,13 +145,13 @@ NiuTrans 源中 1,266 条记录含 □（占指令数据 0.06%），分两类：
 ```bibtex
 @misc{chinese-classical-corpus,
   title  = {Chinese Classical Corpus},
-  author = {dzxr},
+  author = {gujilab},
   year   = {2026},
-  url    = {https://huggingface.co/datasets/dzxr/chinese-classical-corpus}
+  url    = {https://huggingface.co/datasets/gujilab/chinese-classical-corpus}
 }
 ```
 
-代码仓库：https://github.com/zi6me/chinese-classical-corpus
+代码仓库：https://github.com/gujilab/chinese-classical-corpus
 
 ## License
 

@@ -1,8 +1,8 @@
 # classical-corpus
 
-> 📦 **Available on HuggingFace Datasets**: [dzxr/chinese-classical-corpus](https://huggingface.co/datasets/dzxr/chinese-classical-corpus) — load via `datasets.load_dataset()` without rebuilding from sources.
+> 📦 **Available on HuggingFace Datasets**: [gujilab/chinese-classical-corpus](https://huggingface.co/datasets/gujilab/chinese-classical-corpus) — load via `datasets.load_dataset()` without rebuilding from sources.
 >
-> 🎯 **配套评测基准**: [zi6me/chinese-classical-bench](https://github.com/zi6me/chinese-classical-bench) ([🤗 dzxr/chinese-classical-bench](https://huggingface.co/datasets/dzxr/chinese-classical-bench)) — 500 道题 × 5 任务，测 LLM 古典文献能力
+> 🎯 **配套评测基准**: [gujilab/chinese-classical-bench](https://github.com/gujilab/chinese-classical-bench) ([🤗 gujilab/chinese-classical-bench](https://huggingface.co/datasets/gujilab/chinese-classical-bench)) — 500 道题 × 5 任务，测 LLM 古典文献能力
 
 中国古典文献结构化语料集 — 把殆知阁、wikisource、ctext.org、shuowenjiezi、chtxt、hunterhug 等公开文本转为统一 JSON schema，可直接喂给任何 LLM 训练或评测。
 
