@@ -27,7 +27,8 @@ from pathlib import Path
 _RECOVERY_PATH = Path(__file__).parent.parent / "output" / "box_recovery.json"
 RECOVERY_MAP: dict[str, str] = {}
 if _RECOVERY_PATH.exists():
-    RECOVERY_MAP = json.load(_RECOVERY_PATH.open(encoding="utf-8"))
+    with _RECOVERY_PATH.open(encoding="utf-8") as _fh:
+        RECOVERY_MAP = json.load(_fh)
 
 
 def apply_recovery(book: str, sentence: str) -> str:

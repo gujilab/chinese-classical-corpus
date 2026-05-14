@@ -1,0 +1,34 @@
+# QLoRA training stack for Qwen2.5-7B-Instruct on g6e.xlarge (L40S 48GB, CUDA 12.x).
+# Pinned to a known-compatible set (Nov 2025).
+# Install on the GPU box (NOT the Mac) — bitsandbytes + flash-attn need NVIDIA GPU.
+#
+#   python -m venv .venv && source .venv/bin/activate
+#   pip install --upgrade pip
+#   pip install -r training/requirements.txt
+#   # flash-attn is optional; if it fails to build, train.py auto-falls back to sdpa.
+#   pip install flash-attn==2.7.4.post1 --no-build-isolation
+
+# Core training
+torch==2.5.1
+transformers==4.46.3
+accelerate==1.1.1
+peft==0.13.2
+trl==0.12.1
+bitsandbytes==0.44.1
+datasets==3.1.0
+
+# Optimisers / utilities
+safetensors>=0.4.5
+sentencepiece>=0.2.0
+protobuf>=4.25.1
+tokenizers>=0.20.3
+
+# Eval / serving (server-side)
+vllm==0.6.4.post1                    # for eval_bench.py (matches transformers 4.46)
+pyyaml>=6.0.2
+tensorboard>=2.18.0
+tqdm>=4.66.5
+numpy>=1.26.4,<2.2
+
+# Optional GGUF export (only needed for merge_and_export.py --gguf)
+# llama-cpp-python is NOT required; we shell out to a llama.cpp checkout.

@@ -16,7 +16,7 @@ import random
 import re
 from pathlib import Path
 
-REPO_ROOT = Path("/Users/zion/Documents/zion/classical-corpus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 SOURCE = REPO_ROOT / "output" / "corpus.jsonl"
 OUT_PATH = REPO_ROOT / "output" / "instruct" / "punctuate.jsonl"
 

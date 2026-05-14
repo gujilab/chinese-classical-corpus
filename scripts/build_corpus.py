@@ -26,8 +26,12 @@ def main() -> None:
 
     with CORPUS_PATH.open("w", encoding="utf-8") as out:
         for path in iter_json_files(OUTPUT_DIR):
-            with path.open(encoding="utf-8") as fh:
-                data = json.load(fh)
+            try:
+                with path.open(encoding="utf-8") as fh:
+                    data = json.load(fh)
+            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                print(f"[warn] skipping {path.name}: {e}", flush=True)
+                continue
             for rec in data:
                 out.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 source = rec.get("source", "unknown")

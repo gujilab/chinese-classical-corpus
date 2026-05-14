@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 from opencc import OpenCC
 
-REPO_ROOT = Path("/Users/zion/Documents/zion/classical-corpus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 T2S = OpenCC("t2s")
 DAIZHI = Path.home() / "Documents/zion/reference/Chinese/classical/corpora/daizhigev20"
 CHTXT = Path.home() / "Documents/zion/reference/Chinese/classical/corpora/chtxt"

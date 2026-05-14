@@ -5,7 +5,7 @@ import random
 from collections import defaultdict
 from pathlib import Path
 
-REPO_ROOT = Path("/Users/zion/Documents/zion/classical-corpus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 SOURCE = REPO_ROOT / "output" / "instruct" / "translate.jsonl"
 OUT = REPO_ROOT / "output" / "spotcheck.md"
 

@@ -1,0 +1,101 @@
+# QLoRA fine-tuning config for Qwen2.5-7B-Instruct on chinese-classical-corpus
+# Target hardware: g6e.xlarge (1× L40S, 48GB VRAM)
+# Stage: POC (100K records, ~1 epoch, 6-12h)
+# Loaded by training/train.py via yaml.safe_load.
+
+# ------------------------------------------------------------------
+# Base model
+# ------------------------------------------------------------------
+model:
+  name_or_path: "Qwen/Qwen2.5-7B-Instruct"
+  trust_remote_code: true
+  # Chat template comes from the tokenizer; we pre-format data using it.
+
+# ------------------------------------------------------------------
+# 4-bit (NF4) quantisation — bitsandbytes
+# ------------------------------------------------------------------
+quantization:
+  load_in_4bit: true
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_compute_dtype: "bfloat16"
+  bnb_4bit_use_double_quant: true
+
+# ------------------------------------------------------------------
+# LoRA adapter (peft)
+# ------------------------------------------------------------------
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - up_proj
+    - down_proj
+    - gate_proj
+
+# ------------------------------------------------------------------
+# Data
+# ------------------------------------------------------------------
+data:
+  train_file: "training/data/train.jsonl"
+  eval_file: "training/data/val.jsonl"
+  # train.jsonl/val.jsonl are pre-formatted single-string "text" field
+  # using Qwen2.5 ChatML template; see data_prep.py.
+  text_field: "text"
+  # max_seq_length is a soft cap; we already filtered input/output to <=500
+  # chars in data_prep, so 2048 is comfortable headroom.
+  max_seq_length: 2048
+  packing: false
+
+# ------------------------------------------------------------------
+# Trainer (HuggingFace TRL SFTTrainer)
+# ------------------------------------------------------------------
+training:
+  output_dir: "training/runs/qwen25-7b-classical-qlora"
+  num_train_epochs: 1                  # ≈ 6 250 steps on 100K @ bs 16
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 4       # effective batch = 16
+  learning_rate: 2.0e-4
+  lr_scheduler_type: "cosine"
+  warmup_steps: 100
+  weight_decay: 0.0
+  optim: "paged_adamw_8bit"            # bnb 8-bit optimiser, ~50% mem save
+
+  bf16: true
+  fp16: false
+  tf32: true
+  gradient_checkpointing: true
+  gradient_checkpointing_kwargs:
+    use_reentrant: false
+  # flash_attn_2 is picked up at model load (attn_implementation in train.py).
+
+  logging_steps: 25
+  eval_strategy: "steps"
+  eval_steps: 500
+  save_strategy: "steps"
+  save_steps: 1000
+  save_total_limit: 3
+  load_best_model_at_end: false
+  report_to: "tensorboard"
+
+  # Reproducibility
+  seed: 42
+  data_seed: 42
+
+  # Stability
+  max_grad_norm: 1.0
+  group_by_length: true                # speeds up by batching similar lens
+  ddp_find_unused_parameters: false
+
+# ------------------------------------------------------------------
+# Misc
+# ------------------------------------------------------------------
+misc:
+  hf_hub_offline: false
+  use_flash_attn_2: true               # falls back to sdpa if unavailable
