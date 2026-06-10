@@ -158,17 +158,26 @@ def stratified_sample(pool: list[dict], n: int, rng: random.Random) -> list[dict
         leftover -= share
 
     # Distribute / claw back to land on exactly n.
+    # Each full pass either makes progress or the alloc is fully saturated
+    # (every stratum at its ceiling when adding, or at its floor of 1 when
+    # removing). Break on a no-progress pass so an unsatisfiable leftover
+    # (e.g. floors summing past n) can't spin forever.
     keys = list(buckets.keys())
     while leftover != 0 and keys:
+        progressed = False
         for k in list(keys):
             if leftover > 0 and alloc[k] < len(buckets[k]):
                 alloc[k] += 1
                 leftover -= 1
+                progressed = True
             elif leftover < 0 and alloc[k] > 1:
                 alloc[k] -= 1
                 leftover += 1
+                progressed = True
             if leftover == 0:
                 break
+        if not progressed:
+            break
 
     out: list[dict] = []
     for k, items in buckets.items():

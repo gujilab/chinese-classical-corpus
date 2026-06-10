@@ -100,7 +100,7 @@ def main() -> int:
     print(f"[load] tokenizer: {m['name_or_path']}")
     tokenizer = AutoTokenizer.from_pretrained(
         m["name_or_path"],
-        trust_remote_code=m.get("trust_remote_code", True),
+        trust_remote_code=m.get("trust_remote_code", False),
         use_fast=True,
     )
     if tokenizer.pad_token is None:

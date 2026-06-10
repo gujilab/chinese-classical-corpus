@@ -72,12 +72,19 @@ def launch_vllm(merged_dir: Path, served_name: str, port: int, log_path: Path):
     cmd = [
         "vllm", "serve", str(merged_dir),
         "--served-model-name", served_name,
-        "--host", "0.0.0.0",
+        # Bind to loopback only: the eval runner talks to vLLM on the same host,
+        # so there is no reason to expose the unauthenticated endpoint (api-key
+        # defaults to "EMPTY") on every interface. Override --base-url if you
+        # intentionally need remote access behind your own auth/proxy.
+        "--host", "127.0.0.1",
         "--port", str(port),
         "--dtype", "bfloat16",
         "--max-model-len", "8192",
         # L40S = 48GB, leave headroom for KV cache; 0.85 is conservative.
         "--gpu-memory-utilization", "0.85",
+        # NOTE: --trust-remote-code lets vLLM execute custom modeling code from
+        # the model dir. Kept because some HF configs need it to load; only ever
+        # point --merged at a model you produced/trust. Bind stays on loopback.
         "--trust-remote-code",
     ]
     print(f"[vllm] launching: {' '.join(cmd)}")

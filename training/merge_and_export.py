@@ -49,6 +49,10 @@ def main() -> int:
                     help="path to llama.cpp checkout (for GGUF export)")
     ap.add_argument("--gguf-quant", default="q4_k_m",
                     help="GGUF quantisation (e.g. q4_k_m, q5_k_m, q8_0)")
+    ap.add_argument("--trust-remote-code", action="store_true", default=False,
+                    help="allow executing custom modeling code shipped with the "
+                         "model repo (security risk; off by default — Qwen2.5 "
+                         "does not need it)")
     args = ap.parse_args()
 
     if not args.adapter.exists():
@@ -70,7 +74,7 @@ def main() -> int:
     base = AutoModelForCausalLM.from_pretrained(
         args.base_model,
         torch_dtype=dtype,
-        trust_remote_code=True,
+        trust_remote_code=args.trust_remote_code,
         device_map="cpu",          # merge on CPU to avoid VRAM blowup
         low_cpu_mem_usage=True,
     )
@@ -85,7 +89,7 @@ def main() -> int:
 
     # tokenizer
     try:
-        tok = AutoTokenizer.from_pretrained(args.base_model, trust_remote_code=True)
+        tok = AutoTokenizer.from_pretrained(args.base_model, trust_remote_code=args.trust_remote_code)
         tok.save_pretrained(str(args.out))
     except Exception as e:
         print(f"[warn] tokenizer save failed ({e}); copying from adapter dir if any")
